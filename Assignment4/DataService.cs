@@ -4,41 +4,52 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Assignment4;
 
+
 namespace Assignment4
 {
-    public class DataService
+    public class DataService: IDataService
     {
         private readonly NorthwindContext _context;
+
 
         public DataService()
         {
             _context = new NorthwindContext();
         }
 
-  
 
-        public List<Category> GetCategories()
+ 
+
+
+        public IList<Category> GetCategories()
         {
             return _context.Categories.ToList();
         }
+
 
         public Category ? GetCategory(int id)
         {
             return _context.Categories.Find(id);
         }
 
+
         public Category CreateCategory(string name, string description)
         {
-            var newCategory = new Category
-            {
+            int newId = _context.Categories.Max(c => c.Id) + 1;
+           
+            Category newCategory  = new Category
+             {
+                Id = newId,
                 Name = name,
                 Description = description,
             };
+
 
             _context.Categories.Add(newCategory);
             _context.SaveChanges();
             return newCategory;
         }
+
 
         public bool DeleteCategory(int id)
         {
@@ -51,6 +62,7 @@ namespace Assignment4
             }
             return false;
         }
+
 
         public bool UpdateCategory(int id, string newName, string newDescription)
         {
@@ -67,10 +79,13 @@ namespace Assignment4
 
 
 
+
+
+
         public DTOProductExt GetProduct(int id)
         {
             var prod = _context.Products
-                .Include(x => x.Category) 
+                .Include(x => x.Category)
                 .Select(x => new DTOProductExt
                 {
                     Id = x.Id,
@@ -78,11 +93,13 @@ namespace Assignment4
                     UnitPrice = x.UnitPrice,
                     QuantityPerUnit = x.QuantityPerUnit,
                     UnitsInStock = x.UnitsInStock,
-                    CategoryName = x.Category.Name 
-                }).FirstOrDefault(x => x.Id == id);
+                    CategoryName = x.Category.Name
+                }).FirstOrDefault(x => id == x.Id);
+
 
             return prod;
         }
+
 
         public ICollection<DTOProductCategory> GetProductByName(string s)
         {
@@ -92,11 +109,13 @@ namespace Assignment4
                 .Select(x => new DTOProductCategory
                 {
                     ProductName = x.Name,
-                    CategoryName = x.Category.Name 
+                    CategoryName = x.Category.Name
                 }).ToList();
+
 
             return searchedProducts;
         }
+
 
         public ICollection<DTOProductExt> GetProductByCategory(int categoryId)
         {
@@ -110,13 +129,16 @@ namespace Assignment4
                     UnitPrice = x.UnitPrice,
                     QuantityPerUnit = x.QuantityPerUnit,
                     UnitsInStock = x.UnitsInStock,
-                    CategoryName = x.Category.Name 
+                    CategoryName = x.Category.Name
                 }).ToList();
+
 
             return categoryProducts;
         }
 
-  
+
+ 
+
 
         public Order GetOrder(int orderId)
         {
@@ -126,10 +148,12 @@ namespace Assignment4
                         .ThenInclude(x => x.Category)
                 .FirstOrDefault(x => x.Id == orderId);
 
+
             return order;
         }
 
-        public ICollection<DTOOrderShipped> GetOrders(string shipName)
+
+        public ICollection<DTOOrderShipped> GetOrdersByShipName(string shipName)
         {
             var orders = _context.Orders
                 .Where(x => x.ShipName == shipName)
@@ -141,8 +165,10 @@ namespace Assignment4
                     ShipCity = x.ShipCity
                 }).ToList();
 
+
             return orders;
         }
+
 
         public ICollection<DTOOrderShipped> GetOrders()
         {
@@ -155,30 +181,48 @@ namespace Assignment4
                     ShipCity = x.ShipCity
                 }).ToList();
 
+
             return orders;
         }
 
 
 
-        public ICollection<OrderDetail> GetOrderDetailsByOrderId(int orderId)
+
+
+
+        public ICollection<OrderDetails> GetOrderDetailsByOrderId(int orderId)
         {
-            var orderDetails = _context.OrderDetails
+            var orderDetails = _context.orderDetails
                 .Include(x => x.Product)
                 .Where(x => x.OrderId == orderId)
                 .ToList();
 
+
             return orderDetails;
         }
 
-        public ICollection<OrderDetail> GetOrderDetailsByProductId(int productId)
+
+        public ICollection<OrderDetails> GetOrderDetailsByProductId(int productId)
         {
-            var orderDetails = _context.OrderDetails
-                .Include(x => x.Product)
+            var orderDetails = _context.orderDetails
+            .Include(x => x.Product)
                 .Include(x => x.Order)
                 .Where(x => x.ProductId == productId)
                 .ToList();
 
+
             return orderDetails;
         }
+
+
+        public object GetProductByCategory()
+        {
+            throw new NotImplementedException();
+        }
+
+
     }
 }
+
+
+
