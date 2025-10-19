@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using Assignment4;
 
 namespace Assignment4.Controllers
@@ -14,32 +15,48 @@ namespace Assignment4.Controllers
             _dataService = dataService;
         }
 
-        [HttpGet("{id}")]
-        public ActionResult<Product> GetProductById(int id)
+        
+        [HttpGet]
+        public ActionResult<IEnumerable<DTOProductExt>> GetAllProducts()
         {
-            var product = _dataService.GetProduct(id);
-            if (product == null)
-                return NotFound();
-            return Ok(product);
-        }
 
-        [HttpGet("category/{id}")]
-        public ActionResult<IList<Product>> GetProductsByCategory(int id)
-        {
-            var products = _dataService.GetProductByCategory(id);
-            if (products == null || products.Count == 0)
-                return NotFound();
+            var products = _dataService.GetProductByCategory(1);
             return Ok(products);
         }
 
-        // [HttpGet]
-        // public ActionResult<IList<ProductSearchModel>> GetProductsByName([FromQuery] string name)
-        // {
-        //     var products = _dataService.GetProductByName(name);
-        //     if (products == null || products.Count == 0)
-        //         return NotFound();
-        //     return Ok(products);
-        // }
+        
+        [HttpGet("{id}")]
+        public ActionResult<DTOProductExt> GetProduct(int id)
+        {
+            var product = _dataService.GetProduct(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(product);
+        }
+
+        [HttpGet("category/{categoryId}")]
+        public ActionResult<IEnumerable<DTOProductExt>> GetProductsByCategory(int categoryId)
+        {
+            var products = _dataService.GetProductByCategory(categoryId);
+            if (products.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(products);
+        }
+
+    
+        [HttpGet("name/{search}")]
+        public ActionResult<IEnumerable<DTOProductCategory>> GetProductsByName(string search)
+        {
+            var products = _dataService.GetProductByName(search);
+            if (products.Count == 0)
+            {
+                return NotFound();
+            }
+            return Ok(products);
+        }
     }
 }
-

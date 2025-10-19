@@ -24,5 +24,6 @@ namespace Assignment4
         // Order Details
         ICollection<OrderDetails> GetOrderDetailsByOrderId(int orderId);
         ICollection<OrderDetails> GetOrderDetailsByProductId(int productId);
+
     }
 }
